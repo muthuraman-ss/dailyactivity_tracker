@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sticky Notes - Daily Activity</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .note-input {
+      margin-bottom: 20px;
+    }
+
+    #noteText {
+      width: 300px;
+      height: 80px;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+
+    #addNoteBtn {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background-color: #ffcc00;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    #addNoteBtn:hover {
+      background-color: #e6b800;
+    }
+
+    .notes-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .note {
+      width: 180px;
+      min-height: 150px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+      position: relative;
+      word-wrap: break-word;
+      color: #333;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #ff5252;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sticky Notes - Daily Activity Tracker</h1>
+  <div class="note-input">
+    <textarea id="noteText" placeholder="Type your activity note here..."></textarea>
+    <button id="addNoteBtn">Add Note</button>
+  </div>
+  <div id="notesContainer" class="notes-container"></div>
+
+  <script>
+    const noteText = document.getElementById('noteText');
+    const addNoteBtn = document.getElementById('addNoteBtn');
+    const notesContainer = document.getElementById('notesContainer');
+
+    // Load notes from localStorage
+    let notes = JSON.parse(localStorage.getItem('stickyNotes')) || [];
+
+    // Load colors from localStorage (parallel array)
+    let noteColors = JSON.parse(localStorage.getItem('stickyNoteColors')) || [];
+
+    function saveNotes() {
+      localStorage.setItem('stickyNotes', JSON.stringify(notes));
+      localStorage.setItem('stickyNoteColors', JSON.stringify(noteColors));
+    }
+
+    function getRandomColor() {
+      function getRandomColor() {
+  const colors = [
+    '#fff59d', // light yellow
+    '#a8dadc', // soft blue
+    '#b7e4c7', // pastel green
+    '#ffadad', // pink
+    '#cdb4db', // lavender
+    '#fbc4ab', // peach
+    '#fde2e4', // light blush
+    '#ffc8dd', // pinkish
+    '#d0f4de', // mint
+    '#caffbf', // light green
+    '#9bf6ff', // sky blue
+    '#a0c4ff', // baby blue
+    '#bdb2ff', // soft purple
+    '#ffb4a2', // orange-peach
+    '#e4c1f9', // lilac
+    '#ffd6a5', // orange-yellow
+    '#fdffb6', // pale yellow
+    '#cafffb', // light aqua
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+    }
+
+    function createNoteElement(note, color, index) {
+      const noteDiv = document.createElement('div');
+      noteDiv.classList.add('note');
+
+      // Set the background color from saved color
+      noteDiv.style.background = color;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.classList.add('delete-btn');
+      deleteBtn.textContent = '×';
+      deleteBtn.onclick = () => {
+        notes.splice(index, 1);
+        noteColors.splice(index,1);
+        saveNotes();
+        renderNotes();
+      };
+
+      const noteContent = document.createElement('p');
+      noteContent.textContent = note;
+
+      noteDiv.appendChild(deleteBtn);
+      noteDiv.appendChild(noteContent);
+
+      return noteDiv;
+    }
+
+    function renderNotes() {
+      notesContainer.innerHTML = '';
+      notes.forEach((note, index) => {
+        const color = noteColors[index] || '#fff59d'; // fallback color
+        const noteElement = createNoteElement(note, color, index);
+        notesContainer.appendChild(noteElement);
+      });
+    }
+
+    addNoteBtn.addEventListener('click', () => {
+      const note = noteText.value.trim();
+      if (note) {
+        notes.push(note);
+        noteColors.push(getRandomColor()); // assign random color for new note
+        saveNotes();
+        renderNotes();
+        noteText.value = '';
+      }
+    });
+
+    // Initial render
+    renderNotes();
+  </script>
+</body>
+</html>
+
+
